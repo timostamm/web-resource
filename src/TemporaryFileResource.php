@@ -12,15 +12,15 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
  * @author Timo Stamm <ts@timostamm.de>
  * @license AGPLv3.0 https://www.gnu.org/licenses/agpl-3.0.txt
  */
-class TempResource implements LocalResourceInterface, TemporaryResourceInterface
+class TemporaryFileResource implements FileResourceInterface, TemporaryResourceInterface
 {
 
 	public static function fromResource(ResourceInterface $resource)
 	{
-		if ($resource instanceof TempResource) {
+		if ($resource instanceof TemporaryFileResource) {
 			return $resource;
 		}
-		$temp = new TempResource($resource->getFilename(), $resource->getMimetype(), $resource->getLastModified());
+		$temp = new TemporaryFileResource($resource->getFilename(), $resource->getMimetype(), $resource->getLastModified());
 		file_put_contents($temp->getPath(), $resource->getStream());
 		return $temp;
 	}
@@ -83,7 +83,7 @@ class TempResource implements LocalResourceInterface, TemporaryResourceInterface
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see LocalResourceInterface::getPath()
+	 * @see FileResourceInterface::getPath()
 	 */
 	public function getPath()
 	{
@@ -170,7 +170,7 @@ class TempResource implements LocalResourceInterface, TemporaryResourceInterface
 
 	public function __toString()
 	{
-		return sprintf('[TempResource %s %s %s]', $this->getFilename(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));
+		return sprintf('[TemporaryFileResource %s %s %s]', $this->getFilename(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));
 	}
 
 	public function dispose()

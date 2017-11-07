@@ -65,7 +65,7 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 		
 		file_put_contents($path, $this->getStream());
 		
-		$res = new LocalResource($path, [
+		$res = new FileResource($path, [
 			'mimetype' => $this->getMimetype(), 
 			'lastmodified' => $this->getLastModified()
 		]);

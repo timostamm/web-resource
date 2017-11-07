@@ -13,12 +13,12 @@ class Resource implements ResourceInterface
 
 	public static function createTemp($filename = null, $mimetype = null, \DateTime $lastmodified = null)
 	{
-		return new TempResource($filename, $mimetype, $lastmodified);
+		return new TemporaryFileResource($filename, $mimetype, $lastmodified);
 	}
 
 	public static function fromFile($path, array $attributes = null)
 	{
-		return new LocalResource($path, $attributes);
+		return new FileResource($path, $attributes);
 	}
 
 	public static function fromUrl($url, array $attributes = null)

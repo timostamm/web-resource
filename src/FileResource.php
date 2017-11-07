@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
  * @author Timo Stamm <ts@timostamm.de>
  * @license AGPLv3.0 https://www.gnu.org/licenses/agpl-3.0.txt
  */
-class LocalResource implements LocalResourceInterface
+class FileResource implements FileResourceInterface
 {
 
 	/**
@@ -19,15 +19,15 @@ class LocalResource implements LocalResourceInterface
 	 *
 	 * @param ResourceInterface $resource
 	 * @param string $path
-	 * @return LocalResource
+	 * @return FileResource
 	 */
 	public static function fromResource(ResourceInterface $resource, $path)
 	{
-		if ($resource instanceof LocalResourceInterface) {
+		if ($resource instanceof FileResourceInterface) {
 			return $resource;
 		}
 		file_put_contents($path, $resource->getStream());
-		return new LocalResource($path, [
+		return new FileResource($path, [
 			'mimetype' => $resource->getMimetype(),
 			'lastmodified' => $resource->getLastModified()
 		]);
@@ -122,7 +122,7 @@ class LocalResource implements LocalResourceInterface
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see LocalResourceInterface::open()
+	 * @see FileResourceInterface::open()
 	 */
 	public function open($mode, resource $context = null)
 	{
@@ -135,7 +135,7 @@ class LocalResource implements LocalResourceInterface
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see LocalResourceInterface::getPath()
+	 * @see FileResourceInterface::getPath()
 	 */
 	public function getPath()
 	{
@@ -224,7 +224,7 @@ class LocalResource implements LocalResourceInterface
 
 	public function __toString()
 	{
-		return sprintf('[LocalResource %s %s %s]', $this->getPath(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));
+		return sprintf('[FileResource %s %s %s]', $this->getPath(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));
 	}
 
 }
