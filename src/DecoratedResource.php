@@ -8,80 +8,36 @@ namespace TS\Web\Resource;
  * @author Timo Stamm <ts@timostamm.de>
  * @license AGPLv3.0 https://www.gnu.org/licenses/agpl-3.0.txt
  */
-class Resource implements ResourceInterface
+class DecoratedResource implements ResourceInterface
 {
 
-	public static function createTemp($filename = null, $mimetype = null, \DateTime $lastmodified = null)
-	{
-		return new TemporaryFileResource($filename, $mimetype, $lastmodified);
-	}
+	private $content = false;
 
-	public static function fromFile($path, array $attributes = null)
-	{
-		return new FileResource($path, $attributes);
-	}
+	private $streamFn = false;
 
-	public static function fromUrl($url, array $attributes = null)
-	{
-		return new UrlResource($url, $attributes);
-	}
+	private $filename = false;
+
+	private $mimetype = false;
+
+	private $length = false;
+
+	private $lastModified = false;
+
+	private $hash = false;
+
+	private $resource;
 	
-	public static function decorate(ResourceInterface $resource, array $attributes) {
-		return new DecoratedResource($resource, $attributes);
-	}
-	
-
-	private $content;
-
-	private $streamFn;
-
-	private $filename;
-
-	private $mimetype;
-
-	private $length;
-
-	private $lastModified;
-
-	private $hash;
-
 	/**
 	 *
 	 * @param array $attributes
 	 */
-	public function __construct(array $attributes)
+	public function __construct(ResourceInterface $resource, array $attributes)
 	{
-		$this->requireAttributes($attributes, [
-			'filename',
-			'mimetype'
-		]);
+		$this->resource = $resource;
 		if (array_key_exists('stream', $attributes) && array_key_exists('content', $attributes)) {
 			throw new \InvalidArgumentException('Attribute "stream" and "content" are exclusive.');
 		}
-		if (! array_key_exists('stream', $attributes) && ! array_key_exists('content', $attributes)) {
-			throw new \InvalidArgumentException('Missing attribute "stream" or "content".');
-		}
-		if (array_key_exists('content', $attributes)) {
-			$attributes['length'] = strlen($attributes['content']);
-		} else {
-			$this->requireAttributes($attributes, [
-				'length'
-			]);
-		}
 		$this->acceptAttributes($attributes);
-	}
-
-	private function requireAttributes(array & $attributes, array $required)
-	{
-		$missing = [];
-		foreach ($required as $r) {
-			if (array_key_exists($r, $attributes) == false) {
-				$missing[] = $r;
-			}
-		}
-		if (count($missing) > 0) {
-			throw new \InvalidArgumentException(sprintf('Missing attributes "%s"', implode('", "', $missing)));
-		}
 	}
 
 	private function acceptAttributes(array & $attributes)
@@ -165,7 +121,7 @@ class Resource implements ResourceInterface
 	 */
 	public function getFilename()
 	{
-		return $this->filename;
+		return $this->filename === false ? $this->resource->getFilename() : $this->filename;
 	}
 
 	/**
@@ -175,7 +131,7 @@ class Resource implements ResourceInterface
 	 */
 	public function getMimetype()
 	{
-		return $this->mimetype;
+		return $this->mimetype === false ? $this->resource->getMimetype() : $this->mimetype;
 	}
 
 	/**
@@ -185,7 +141,7 @@ class Resource implements ResourceInterface
 	 */
 	public function getLength()
 	{
-		return $this->length;
+		return $this->length === false ? $this->resourcegetLength>getMimetype() : $this->length;
 	}
 
 	/**
@@ -195,10 +151,7 @@ class Resource implements ResourceInterface
 	 */
 	public function getLastModified()
 	{
-		if (is_null($this->lastModified)) {
-			return new \DateTime();
-		}
-		return $this->lastModified;
+		return $this->lastModified === false ? $this->resource->getLastModified() : $this->lastModified;
 	}
 
 	/**
@@ -208,18 +161,7 @@ class Resource implements ResourceInterface
 	 */
 	public function getHash()
 	{
-		if (is_null($this->hash)) {
-			if ($this->content != null) {
-				$this->hash = sha1($this->content);
-			} else {
-				$path = ResourceUtil::createTempDir() . DIRECTORY_SEPARATOR . $this->getFilename();
-				file_put_contents($path, $this->getStream());
-				$this->hash = sha1_file($path);
-				unlink($path);
-				rmdir(dirname($path));
-			}
-		}
-		return $this->hash;
+		return $this->hash === false ? $this->resource->getHash() : $this->hash;
 	}
 
 	/**
@@ -229,14 +171,17 @@ class Resource implements ResourceInterface
 	 */
 	public function getStream($context = null)
 	{
-		if (is_string($this->content)) {
+		if ($this->content !== false) {
 			$stream = fopen('php://memory', 'r+');
 			fwrite($stream, $this->content);
 			rewind($stream);
 			return $stream;
 		}
-		$fn = $this->streamFn;
-		return $fn($context);
+		if ($this->streamFn !== false) {
+			$fn = $this->streamFn;
+			return $fn($context);
+		}
+		return $this->resource->getStream($context);
 	}
 
 	public function __toString()
