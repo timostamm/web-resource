@@ -163,6 +163,13 @@ class FileResource implements FileResourceInterface
 	public function getMimetype()
 	{
 		if (is_null($this->mimetype)) {
+			$ext = pathinfo($this->path, PATHINFO_EXTENSION);
+			if ($ext === 'css') {
+				return 'text/css';
+			}
+			if ($ext === 'js') {
+				return 'text/javascript';
+			}
 			$guesser = MimeTypeGuesser::getInstance();
 			$this->mimetype = $guesser->guess($this->getPath());
 		}
