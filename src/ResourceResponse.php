@@ -100,7 +100,7 @@ class ResourceResponse extends Response
 		
 		if (! $this->headers->has('Accept-Ranges')) {
 			// Only accept ranges on safe HTTP methods
-			$this->headers->set('Accept-Ranges', $request->isMethodSafe( true ) ? 'bytes' : 'none');
+			$this->headers->set('Accept-Ranges', $request->isMethodSafe( false ) ? 'bytes' : 'none');
 		}
 		
 		if (! $this->headers->has('Content-Type')) {
