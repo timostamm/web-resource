@@ -141,7 +141,7 @@ class DecoratedResource implements ResourceInterface
 	 */
 	public function getLength()
 	{
-		return $this->length === false ? $this->resourcegetLength>getMimetype() : $this->length;
+		return $this->length === false ? $this->resource->getLength() : $this->length;
 	}
 
 	/**
