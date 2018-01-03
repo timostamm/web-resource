@@ -27,10 +27,12 @@ class FileResource implements FileResourceInterface
 			return $resource;
 		}
 		file_put_contents($path, $resource->getStream());
-		return new FileResource($path, [
+		$attr = [
 			'mimetype' => $resource->getMimetype(),
-			'lastmodified' => $resource->getLastModified()
-		]);
+			'lastmodified' => $resource->getLastModified(), 
+			'filename' => $resource->getFilename()
+		];
+		return new FileResource($path, $attr);
 	}
 
 	private $path;

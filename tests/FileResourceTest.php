@@ -13,7 +13,19 @@ class FileResourceTest extends TestCase
 
 	public function testFromResource()
 	{
-		$this->markTestIncomplete("fromResource test not implemented");
+		$r = new Resource([
+			'content' => 'abc', 
+			'mimetype' => 'text/plain', 
+			'filename' => 'text.txt'
+		]);
+		
+		$path = ResourceUtil::createTempFile('resource');
+		
+		$f = FileResource::fromResource($r, $path);
+		
+		$this->assertEquals($path, $f->getPath());
+		
+		$this->assertEquals('text.txt', $f->getFilename());
 	}
 
 	public function testConstructor()

@@ -4,14 +4,17 @@ namespace TS\Web\Resource;
 
 
 if (php_sapi_name() == 'cli-server') {
-	if (preg_match('/^\/foo-no-content-length$/', $_SERVER["REQUEST_URI"])) {
+	if (preg_match('/^\/$/', $_SERVER["REQUEST_URI"])) {
+		header('Content-Type: text/html');
+		print "index";
+	} else if (preg_match('/^\/foo-no-content-length$/', $_SERVER["REQUEST_URI"])) {
 		header('Content-Type: application/x-foo');
 		print "foo";
 	} else if (preg_match('/^\/foo-error$/', $_SERVER["REQUEST_URI"])) {
 		header('HTTP/1.1 500 Internal Server Error');
 		print "foo";
 	} else {
-		// route statische Assets und gibt false zurück
+		// return false to route static assets
 		return false;
 	}
 	return true;

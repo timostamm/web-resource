@@ -5,29 +5,43 @@ namespace TS\Web\Resource;
 
 class UrlResourceTest extends WebTestCase
 {
-	
-	public function downloadTest() {
+
+	public function testDownload()
+	{
 		$dir = ResourceUtil::createTempDir();
 		$url = new UrlResource(self::$base_url . 'plaintext.txt');
 		$local = $url->download($dir);
 		$this->assertSame($url->getMimetype(), $local->getMimetype());
+		$this->assertSame('plaintext.txt', $local->getFilename());
 		$this->assertSame($url->getFilename(), $local->getFilename());
 		$this->assertSame($url->getLastModified(), $local->getLastModified());
 		$this->assertSame($url->getLength(), $local->getLength());
 		$this->assertSame($url->getHash(), $local->getHash());
 		unlink($local->getPath());
 	}
-	
-	public function downloadAsTest() {
+
+	public function testDownloadAs()
+	{
 		$path = ResourceUtil::createTempDir() . 'test.txt';
 		$url = new UrlResource(self::$base_url . 'plaintext.txt');
 		$local = $url->downloadAs($path);
+		
 		$this->assertSame($url->getMimetype(), $local->getMimetype());
 		$this->assertSame($url->getFilename(), $local->getFilename());
+		$this->assertSame('plaintext.txt', $local->getFilename());
 		$this->assertSame($url->getLastModified(), $local->getLastModified());
 		$this->assertSame($url->getLength(), $local->getLength());
 		$this->assertSame($url->getHash(), $local->getHash());
 		unlink($local->getPath());
+	}
+	
+	public function testNoFilenameInUrl()
+	{
+		$r = new UrlResource(self::$base_url);
+		
+		$this->assertSame('text/html;charset=UTF-8', $r->getMimetype());
+		$this->assertSame('localhost:8000.html', $r->getFilename());
+		$this->assertSame('index', stream_get_contents($r->getStream()));
 	}
 	
 	public function testPlaintext()

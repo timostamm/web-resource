@@ -3,21 +3,28 @@
 namespace TS\Web\Resource;
 
 
+use PHPUnit\Framework\TestCase;
+
+
 /**
  *
  * @author Timo Stamm <ts@timostamm.de>
  * @license AGPLv3.0 https://www.gnu.org/licenses/agpl-3.0.txt
  */
-class TemporaryFileResourceTest extends WebTestCase
+class TemporaryFileResourceTest extends TestCase
 {
 
-	
 	public function testFromResource()
 	{
-		$this->markTestIncomplete("fromResource test not implemented");
+		$r = new Resource([
+			'content' => 'abc',
+			'mimetype' => 'text/plain',
+			'filename' => 'text.txt'
+		]);
+		$t = TemporaryFileResource::fromResource($r);
+		$this->assertEquals('text.txt', $t->getFilename());
 	}
-	
-	
+
 	public function test()
 	{
 		$res = new TemporaryFileResource('foo.txt', 'text/plain');
@@ -30,7 +37,7 @@ class TemporaryFileResourceTest extends WebTestCase
 		$res->dispose();
 		$this->assertFalse(file_exists($res->getPath()));
 	}
-	
+
 	public function testOpen()
 	{
 		$r = new TemporaryFileResource('foo.txt', 'text/plain');
@@ -38,7 +45,7 @@ class TemporaryFileResourceTest extends WebTestCase
 		$this->assertTrue(is_resource($h));
 		fclose($h);
 	}
-	
+
 	public function testGetStream()
 	{
 		$r = new TemporaryFileResource('foo.txt', 'text/plain');
@@ -46,15 +53,13 @@ class TemporaryFileResourceTest extends WebTestCase
 		$this->assertTrue(is_resource($h));
 		fclose($h);
 	}
-	
 
 	public function testFilenameSane()
 	{
 		$res = new TemporaryFileResource("../bad\n\0.txt", 'text/plain');
 		$this->assertSame('bad.txt', $res->getFilename());
 	}
-	
-	
+
 	/**
 	 * Tests FileResource->__toString()
 	 */
@@ -62,7 +67,7 @@ class TemporaryFileResourceTest extends WebTestCase
 	{
 		$r = new TemporaryFileResource('test.txt', 'text/plain');
 		$this->assertSame(sprintf('[TemporaryFileResource %s text/plain 0B]', $r->getFilename()), (string) $r);
-		
+	
 	}
 
 }

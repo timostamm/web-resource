@@ -64,7 +64,7 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 		$this->mimetype = $mimetype;
 		$this->lastmodified = $lastmodified;
 		
-		$this->path = static::createTempFile($this->filename);
+		$this->path = ResourceUtil::createTempFile($this->filename);
 		
 		touch($this->path);
 		
@@ -195,37 +195,6 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 
 	private static $instances = [];
 
-	private static function createTempFile($filename)
-	{
-		$returnCode = 0;
-		$outputLines = [];
-		$command = 'mktemp 2>&1 -d';
-		$lastLine = exec($command, $outputLines, $returnCode);
-		if ($returnCode !== 0) {
-			$msg = sprintf('Failed to create temp dir using mktemp. Command "%s" exited with code %s and output "%s".', $command, $returnCode, implode("\n", $outputLines));
-			throw new \LogicException($msg);
-		}
-		if (! is_dir($lastLine)) {
-			throw new \LogicException(sprintf('Failed to create temp dir "%s".', $lastLine));
-		}
-		return $lastLine . DIRECTORY_SEPARATOR . $filename;
-	}
-
-	private static function createTempDir()
-	{
-		$returnCode;
-		$outputLines = [];
-		$command = 'mktemp 2>&1 -d';
-		$lastLine = exec($command, $outputLines, $returnCode);
-		if ($returnCode !== 0) {
-			$msg = sprintf('Failed to create temp dir using mktemp. Command "%s" exited with code %s and output "%s".', $command, $returnCode, implode("\n", $outputLines));
-			throw new \LogicException($msg);
-		}
-		if (! is_dir($lastLine)) {
-			throw new \LogicException(sprintf('Failed to create temp dir "%s".', $lastLine));
-		}
-		return $lastLine;
-	}
 
 }
 

@@ -3,6 +3,8 @@
 namespace TS\Web\Resource;
 
 
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+
 /**
  *
  * @author Timo Stamm <ts@timostamm.de>
@@ -77,8 +79,15 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 		if (file_exists($file)) {
 			throw new \InvalidArgumentException(sprintf('File "%s" already exists.', $file));
 		}
-		
+		file_put_contents($file, $this->getStream());
+		$res = new FileResource($file, [
+			'mimetype' => $this->getMimetype(),
+			'lastmodified' => $this->getLastModified(), 
+			'filename' => $this->getFilename()
+		]);
+		return $res;
 	}
+	
 
 	private function acceptAttributes(array & $attributes)
 	{
@@ -146,6 +155,16 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 	{
 		if ($this->filename == null) {
 			$this->requestHead();
+		}
+		if ($this->filename == null) {
+			$filename = pathinfo($this->url)['basename'];
+			if (pathinfo($filename, PATHINFO_EXTENSION) === '') {
+				$ext = ExtensionGuesser::getInstance()->guess(explode(';', $this->getMimetype())[0]);
+				if ($ext && $filename) {
+					$filename .= '.' . $ext;
+				}
+			}
+			$this->filename = $filename;
 		}
 		return $this->filename;
 	}
@@ -322,9 +341,10 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 		}
 		curl_close($ch);
 
-		if ($this->filename == null) {
-			$val = isset($a['filename']) ? $a['filename'] : pathinfo($this->url)['basename'];
-			$this->filename = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+		if ($this->filename == null && isset($a['filename'])) {
+			$val = $a['filename'];
+			$val = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+			$this->filename = $val;
 		}
 		if ($this->lastModified == null) {
 			$this->lastModified = isset($a['lastModified']) ? $a['lastModified'] : $a['date'];
