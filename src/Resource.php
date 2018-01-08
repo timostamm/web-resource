@@ -3,6 +3,8 @@
 namespace TS\Web\Resource;
 
 
+use TS\Web\Resource\Exception\InvalidArgumentException;
+
 /**
  *
  * @author Timo Stamm <ts@timostamm.de>
@@ -56,10 +58,10 @@ class Resource implements ResourceInterface
 			'mimetype'
 		]);
 		if (array_key_exists('stream', $attributes) && array_key_exists('content', $attributes)) {
-			throw new \InvalidArgumentException('Attribute "stream" and "content" are exclusive.');
+			throw new InvalidArgumentException('Attribute "stream" and "content" are exclusive.');
 		}
 		if (! array_key_exists('stream', $attributes) && ! array_key_exists('content', $attributes)) {
-			throw new \InvalidArgumentException('Missing attribute "stream" or "content".');
+			throw new InvalidArgumentException('Missing attribute "stream" or "content".');
 		}
 		if (array_key_exists('content', $attributes)) {
 			$attributes['length'] = strlen($attributes['content']);
@@ -80,7 +82,7 @@ class Resource implements ResourceInterface
 			}
 		}
 		if (count($missing) > 0) {
-			throw new \InvalidArgumentException(sprintf('Missing attributes "%s"', implode('", "', $missing)));
+			throw new InvalidArgumentException(sprintf('Missing attributes "%s"', implode('", "', $missing)));
 		}
 	}
 
@@ -92,67 +94,67 @@ class Resource implements ResourceInterface
 				
 				case 'content':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be string but got %s.', $key, gettype($val)));
 					}
 					$this->content = $val;
 					break;
 				
 				case 'stream':
 					if (! is_callable($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be callable but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be callable but got %s.', $key, gettype($val)));
 					}
 					$this->streamFn = $val;
 					break;
 				
 				case 'filename':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new \InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
 					}
 					$this->filename = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
 				
 				case 'length':
 					if (! is_int($val) && ! is_null($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type int but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type int but got %s.', $key, gettype($val)));
 					}
 					if ($val < 0) {
-						throw new \InvalidArgumentException(sprintf('Invalid attribute "%s": %s.', $key, $val));
+						throw new InvalidArgumentException(sprintf('Invalid attribute "%s": %s.', $key, $val));
 					}
 					$this->length = $val;
 					break;
 				
 				case 'lastmodified':
 					if (! $val instanceof \DateTime) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be a DateTime but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be a DateTime but got %s.', $key, gettype($val)));
 					}
 					$this->lastModified = $val;
 					break;
 				
 				case 'mimetype':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new \InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
 					}
 					$this->mimetype = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
 				
 				case 'hash':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new \InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
 					}
 					$this->hash = $val;
 					break;
 				
 				default:
-					throw new \InvalidArgumentException(sprintf('Unknown attribute "%s".', $key));
+					throw new InvalidArgumentException(sprintf('Unknown attribute "%s".', $key));
 			}
 		}
 	

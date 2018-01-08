@@ -4,6 +4,9 @@ namespace TS\Web\Resource;
 
 
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+use TS\Web\Resource\Exception\IOException;
+use TS\Web\Resource\Exception\InvalidArgumentException;
+
 
 /**
  *
@@ -12,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
  */
 class UrlResource implements ResourceInterface, TemporaryResourceInterface
 {
-	
+
 	const DEFAULT_CONNECT_TIMEOUT = 20;
 
 	private $connectTimeout = self::DEFAULT_CONNECT_TIMEOUT;
@@ -37,18 +40,17 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 
 	private $hash;
 
-	
 	/**
+	 *
 	 * @param string $url
 	 * @param array $attributes
-	 * 
-	 * Accepts the following attributes:
-	 * - connectTimeout: Set a custom timeout for the HTTP connection. Default value is 20 seconds. 
-	 * - filename: Overrides any automatically inferred filename.
-	 * - lastmodified: Override the inferred date.
-	 * - mimetype: Override the mimetype.
-	 * - hash: Override the hash.
-	 * 
+	 *        	Accepts the following attributes:
+	 *        	- connectTimeout: Set a custom timeout for the HTTP connection. Default value is 20 seconds.
+	 *        	- filename: Overrides any automatically inferred filename.
+	 *        	- lastmodified: Override the inferred date.
+	 *        	- mimetype: Override the mimetype.
+	 *        	- hash: Override the hash.
+	 *        	
 	 */
 	public function __construct($url, array $attributes = null)
 	{
@@ -57,37 +59,38 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 			$this->acceptAttributes($attributes);
 		}
 	}
-	
-	public function download($directory) {
+
+	public function download($directory)
+	{
 		
 		$path = $directory . DIRECTORY_SEPARATOR . $this->getFilename();
 		if (file_exists($path)) {
-			throw new \InvalidArgumentException(sprintf('File "%s" already exists.', $path));
+			throw new InvalidArgumentException(sprintf('File "%s" already exists.', $path));
 		}
 		
 		file_put_contents($path, $this->getStream());
 		
 		$res = new FileResource($path, [
-			'mimetype' => $this->getMimetype(), 
+			'mimetype' => $this->getMimetype(),
 			'lastmodified' => $this->getLastModified()
 		]);
 		
 		return $res;
 	}
-	
-	public function downloadAs($file) {
+
+	public function downloadAs($file)
+	{
 		if (file_exists($file)) {
-			throw new \InvalidArgumentException(sprintf('File "%s" already exists.', $file));
+			throw new InvalidArgumentException(sprintf('File "%s" already exists.', $file));
 		}
 		file_put_contents($file, $this->getStream());
 		$res = new FileResource($file, [
 			'mimetype' => $this->getMimetype(),
-			'lastmodified' => $this->getLastModified(), 
+			'lastmodified' => $this->getLastModified(),
 			'filename' => $this->getFilename()
 		]);
 		return $res;
 	}
-	
 
 	private function acceptAttributes(array & $attributes)
 	{
@@ -95,52 +98,52 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 		foreach ($attributes as $key => $val) {
 			switch ($key) {
 				
-				case 'connectTimeout': 
+				case 'connectTimeout':
 					if (! is_int($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type integer but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type integer but got %s.', $key, gettype($val)));
 					}
 					$this->connectTimeout = $val;
 					break;
 				
 				case 'filename':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new \InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
 					}
 					$this->filename = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
 				
 				case 'lastmodified':
 					if (! $val instanceof \DateTime) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be a DateTime but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be a DateTime but got %s.', $key, gettype($val)));
 					}
 					$this->lastModified = $val;
 					break;
 				
 				case 'mimetype':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new \InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
 					}
 					$this->mimetype = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
 				
 				case 'hash':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new \InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
 					}
 					$this->hash = $val;
 					break;
 				
 				default:
-					throw new \InvalidArgumentException(sprintf('Unknown attribute "%s".', $key));
+					throw new InvalidArgumentException(sprintf('Unknown attribute "%s".', $key));
 			}
 		}
 	
@@ -284,7 +287,7 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 		$ok = curl_exec($ch);
 		if (! $ok) {
 			$msg = sprintf('Got HTTP %s for URL "%s".', curl_getinfo($ch, CURLINFO_HTTP_CODE), $this->url);
-			throw new \Exception($msg);
+			throw new IOException($msg);
 		}
 		fclose($out);
 		curl_close($ch);
@@ -337,10 +340,10 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 		$ok = curl_exec($ch);
 		if (! $ok) {
 			$msg = sprintf('Got HTTP %s for URL "%s".', curl_getinfo($ch, CURLINFO_HTTP_CODE), $this->url);
-			throw new \Exception($msg);
+			throw new IOException($msg);
 		}
 		curl_close($ch);
-
+		
 		if ($this->filename == null && isset($a['filename'])) {
 			$val = $a['filename'];
 			$val = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);

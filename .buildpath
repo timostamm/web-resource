@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <buildpath>
+	<buildpathentry kind="src" path="tests"/>
 	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
 	<buildpathentry kind="src" path="src">
 		<attributes>
@@ -12,6 +13,11 @@
 		</attributes>
 	</buildpathentry>
 	<buildpathentry kind="src" path="vendor/doctrine/instantiator/src/Doctrine/Instantiator">
+		<attributes>
+			<attribute name="composer" value="vendor"/>
+		</attributes>
+	</buildpathentry>
+	<buildpathentry kind="src" path="vendor/mikey179/vfsStream/src/main/php">
 		<attributes>
 			<attribute name="composer" value="vendor"/>
 		</attributes>

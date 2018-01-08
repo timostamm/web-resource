@@ -3,6 +3,10 @@
 namespace TS\Web\Resource;
 
 
+use TS\Web\Resource\Exception\IOException;
+use TS\Web\Resource\Exception\InvalidArgumentException;
+
+
 /**
  *
  * @author Timo Stamm <ts@timostamm.de>
@@ -45,21 +49,20 @@ class ResourceUtil
 		$lastLine = exec($command, $outputLines, $returnCode);
 		if ($returnCode !== 0) {
 			$msg = sprintf('Failed to create temp dir using mktemp. Command "%s" exited with code %s and output "%s".', $command, $returnCode, implode("\n", $outputLines));
-			throw new \LogicException($msg);
+			throw new IOException($msg);
 		}
 		if (! is_dir($lastLine)) {
-			throw new \LogicException(sprintf('Failed to create temp dir "%s".', $lastLine));
+			throw new IOException(sprintf('Failed to create temp dir "%s".', $lastLine));
 		}
 		return $lastLine . DIRECTORY_SEPARATOR;
 	}
 
-	
 	public static function createTempFile($filename)
 	{
 		$file = filter_var($filename, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 		
 		if (strlen(trim($file)) === 0) {
-			throw new \InvalidArgumentException('Invalid filename "'.$filename.'"');
+			throw new InvalidArgumentException('Invalid filename "' . $filename . '"');
 		}
 		
 		$returnCode = 0;
@@ -68,13 +71,13 @@ class ResourceUtil
 		$lastLine = exec($command, $outputLines, $returnCode);
 		if ($returnCode !== 0) {
 			$msg = sprintf('Failed to create temp dir using mktemp. Command "%s" exited with code %s and output "%s".', $command, $returnCode, implode("\n", $outputLines));
-			throw new \LogicException($msg);
+			throw new IOException($msg);
 		}
 		if (! is_dir($lastLine)) {
-			throw new \LogicException(sprintf('Failed to create temp dir "%s".', $lastLine));
+			throw new IOException(sprintf('Failed to create temp dir "%s".', $lastLine));
 		}
 		return $lastLine . DIRECTORY_SEPARATOR . $file;
 	}
-	
+
 }
 

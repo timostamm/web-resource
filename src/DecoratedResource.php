@@ -3,12 +3,15 @@
 namespace TS\Web\Resource;
 
 
+use TS\Web\Resource\Exception\InvalidArgumentException;
+
+
 /**
  *
  * @author Timo Stamm <ts@timostamm.de>
  * @license AGPLv3.0 https://www.gnu.org/licenses/agpl-3.0.txt
  */
-class DecoratedResource implements ResourceInterface
+class DecoratedResource implements DecoratedResourceInterface
 {
 
 	private $content = false;
@@ -26,7 +29,7 @@ class DecoratedResource implements ResourceInterface
 	private $hash = false;
 
 	private $resource;
-	
+
 	/**
 	 *
 	 * @param array $attributes
@@ -35,7 +38,7 @@ class DecoratedResource implements ResourceInterface
 	{
 		$this->resource = $resource;
 		if (array_key_exists('stream', $attributes) && array_key_exists('content', $attributes)) {
-			throw new \InvalidArgumentException('Attribute "stream" and "content" are exclusive.');
+			throw new InvalidArgumentException('Attribute "stream" and "content" are exclusive.');
 		}
 		$this->acceptAttributes($attributes);
 	}
@@ -48,67 +51,67 @@ class DecoratedResource implements ResourceInterface
 				
 				case 'content':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be string but got %s.', $key, gettype($val)));
 					}
 					$this->content = $val;
 					break;
 				
 				case 'stream':
 					if (! is_callable($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be callable but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be callable but got %s.', $key, gettype($val)));
 					}
 					$this->streamFn = $val;
 					break;
 				
 				case 'filename':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new \InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
 					}
 					$this->filename = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
 				
 				case 'length':
 					if (! is_int($val) && ! is_null($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type int but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type int but got %s.', $key, gettype($val)));
 					}
 					if ($val < 0) {
-						throw new \InvalidArgumentException(sprintf('Invalid attribute "%s": %s.', $key, $val));
+						throw new InvalidArgumentException(sprintf('Invalid attribute "%s": %s.', $key, $val));
 					}
 					$this->length = $val;
 					break;
 				
 				case 'lastmodified':
 					if (! $val instanceof \DateTime) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be a DateTime but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be a DateTime but got %s.', $key, gettype($val)));
 					}
 					$this->lastModified = $val;
 					break;
 				
 				case 'mimetype':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new \InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
 					}
 					$this->mimetype = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
 				
 				case 'hash':
 					if (! is_string($val)) {
-						throw new \InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new \InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
 					}
 					$this->hash = $val;
 					break;
 				
 				default:
-					throw new \InvalidArgumentException(sprintf('Unknown attribute "%s".', $key));
+					throw new InvalidArgumentException(sprintf('Unknown attribute "%s".', $key));
 			}
 		}
 	
@@ -187,6 +190,17 @@ class DecoratedResource implements ResourceInterface
 	public function __toString()
 	{
 		return ResourceUtil::format($this);
+	}
+
+	/**
+	 * The original, undecorated resource.
+	 *
+	 * {@inheritdoc}
+	 * @see \TS\Web\Resource\ResourceProviderInterface::getResource()
+	 */
+	public function getResource()
+	{
+		return $this->resource;
 	}
 
 }

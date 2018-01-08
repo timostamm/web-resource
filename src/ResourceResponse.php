@@ -5,6 +5,7 @@ namespace TS\Web\Resource;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use TS\Web\Resource\Exception\LogicException;
 
 
 /**
@@ -200,7 +201,7 @@ class ResourceResponse extends Response
 	public function setContent($content)
 	{
 		if (null !== $content) {
-			throw new \LogicException('The content cannot be set on a ResourceResponse instance.');
+			throw new LogicException('The content cannot be set on a ResourceResponse instance.');
 		}
 	}
 
