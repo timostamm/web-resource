@@ -138,9 +138,6 @@ trait OptionsTrait {
 				if (! is_array($val)) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be array but got %s.', $key, gettype($val)));
 				}
-				return array_filter($val, function(){
-					return ! is_null($val);
-				});
 				break;
 			
 			default:
