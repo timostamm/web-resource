@@ -55,6 +55,7 @@ class HashStorage
 				$res->getFilename(),
 				$res->getLastModified(),
 				$res->getLength(),
+				$res->getAttributes(), 
 				$mime,
 				$content_name
 			];
@@ -119,14 +120,15 @@ class HashStorage
 			$msg = sprintf('Failed to read meta file "%s".', $meta_path);
 			throw new IOException($msg);
 		}
-		list ($filename, $lastmodified, $length, $mimetype, $content_name) = unserialize($meta);
+		list ($filename, $lastmodified, $length, $attributes, $mimetype, $content_name) = unserialize($meta);
 		$content_path = $dir . '/' . $content_name;
 		
 		$resource = new FileResource($content_path, [
 			'filename' => $filename,
 			'lastmodified' => $lastmodified,
 			'length' => $length,
-			'mimetype' => $mimetype
+			'mimetype' => $mimetype, 
+			'attributes' => $attributes
 		]);
 		return $resource;
 	}
