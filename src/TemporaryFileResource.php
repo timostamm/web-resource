@@ -4,6 +4,7 @@ namespace TS\Web\Resource;
 
 
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 
 /**
@@ -47,10 +48,16 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 	 */
 	public function __construct($filename = null, $mimetype = null, \DateTimeInterface $lastmodified = null)
 	{
-		
 		$this->filename = $this->validateOptional('filename', $filename, 'temp');
 		$this->mimetype = $this->validateOptional('mimetype', $mimetype);
 		$this->lastModified = $this->validateOptional('lastmodified', $lastmodified);
+		
+		if (is_string($this->mimetype) && $this->filename === 'temp') {
+			$ext = ExtensionGuesser::getInstance()->guess($this->mimetype);
+			if (! empty($ext)) {
+				$this->filename .= '.' . $ext;
+			}
+		}
 		
 		$this->path = ResourceUtil::createTempFile($this->filename);
 		
@@ -155,7 +162,7 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 			return fopen($this->path, 'rb', false, $context);
 		}
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 *
@@ -166,8 +173,7 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 	{
 		return $this->attributes;
 	}
-	
-	
+
 	public function __toString()
 	{
 		return sprintf('[TemporaryFileResource %s %s %s]', $this->getFilename(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));

@@ -60,6 +60,12 @@ class TemporaryFileResourceTest extends TestCase
 		$this->assertSame('bad.txt', $res->getFilename());
 	}
 
+	public function testAutoExtension()
+	{
+		$res = new TemporaryFileResource(null, 'text/plain');
+		$this->assertSame('temp.txt', $res->getFilename());
+	}
+
 	/**
 	 * Tests FileResource->__toString()
 	 */
