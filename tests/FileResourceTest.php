@@ -4,8 +4,8 @@ namespace TS\Web\Resource;
 
 
 use PHPUnit\Framework\TestCase;
+use TS\Web\Resource\Exception\IOException;
 use DateTime;
-use InvalidArgumentException;
 
 
 class FileResourceTest extends TestCase
@@ -14,8 +14,8 @@ class FileResourceTest extends TestCase
 	public function testFromResource()
 	{
 		$r = new Resource([
-			'content' => 'abc', 
-			'mimetype' => 'text/plain', 
+			'content' => 'abc',
+			'mimetype' => 'text/plain',
 			'filename' => 'text.txt'
 		]);
 		
@@ -41,7 +41,7 @@ class FileResourceTest extends TestCase
 
 	public function testFileNotFound()
 	{
-		$this->expectException(InvalidArgumentException::class);
+		$this->expectException(IOException::class);
 		new FileResource(__DIR__ . '/Data/does-not-exist');
 	}
 

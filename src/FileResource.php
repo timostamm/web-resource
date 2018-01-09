@@ -5,6 +5,7 @@ namespace TS\Web\Resource;
 
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use TS\Web\Resource\Exception\InvalidArgumentException;
+use TS\Web\Resource\Exception\IOException;
 
 
 /**
@@ -65,7 +66,7 @@ class FileResource implements FileResourceInterface
 			throw new InvalidArgumentException('Invalid type for argument "path".');
 		}
 		if (! file_exists($path)) {
-			throw new InvalidArgumentException(sprintf('File does not exist: %s.', $path));
+			throw new IOException(sprintf('File does not exist: %s.', $path));
 		}
 		if (is_dir($path)) {
 			throw new InvalidArgumentException(sprintf('Path points to a directory: %s.', $path));
