@@ -10,7 +10,7 @@ use InvalidArgumentException;
 class ResourceTest extends TestCase
 {
 
-	public function testEmptyAttributes()
+	public function testEmptyOptions()
 	{
 		$this->expectException(InvalidArgumentException::class);
 		$r = new Resource([]);

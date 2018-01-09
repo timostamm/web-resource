@@ -47,89 +47,41 @@ class FileResource implements FileResourceInterface
 	private $lastModified;
 
 	private $hash;
+	
+	use OptionsTrait;
 
 	/**
 	 *
 	 * @param string $path
-	 * @param array $attributes
+	 * @param array $options
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct($path, array $attributes = null)
+	public function __construct($path, array $options = [])
 	{
-		
-		$path = filter_var($path, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
-		
-		if (file_exists($path) == false) {
-			throw new InvalidArgumentException('Input file does not exists: ' . $path);
+		if (empty($path)) {
+			throw new InvalidArgumentException('Argument "path" is empty.');
+		}
+		if (! is_string($path)) {
+			throw new InvalidArgumentException('Invalid type for argument "path".');
+		}
+		if (! file_exists($path)) {
+			throw new InvalidArgumentException(sprintf('File does not exist: %s.', $path));
+		}
+		if (is_dir($path)) {
+			throw new InvalidArgumentException(sprintf('Path points to a directory: %s.', $path));
 		}
 		
 		$this->path = $path;
 		
-		$this->acceptAttributes($attributes);
-	}
-
-	private function acceptAttributes(array & $attributes = null)
-	{
-		
-		if (! $attributes) {
-			return;
-		}
-		
-		foreach ($attributes as $key => $val) {
-			switch ($key) {
-				
-				case 'filename':
-					if (! is_string($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
-					}
-					if (strlen(trim($val)) == 0) {
-						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
-					}
-					$this->filename = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
-					break;
-				
-				case 'lastmodified':
-					if (! $val instanceof \DateTime) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be a DateTime but got %s.', $key, gettype($val)));
-					}
-					$this->lastModified = $val;
-					break;
-				
-				case 'mimetype':
-					if (! is_string($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
-					}
-					if (strlen(trim($val)) == 0) {
-						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
-					}
-					$this->mimetype = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
-					break;
-				
-				case 'hash':
-					if (! is_string($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
-					}
-					if (strlen(trim($val)) == 0) {
-						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
-					}
-					$this->hash = $val;
-					break;
-					
-				case 'length':
-					if (! is_int($val) && ! is_null($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type int but got %s.', $key, gettype($val)));
-					}
-					if ($val < 0) {
-						throw new InvalidArgumentException(sprintf('Invalid attribute "%s": %s.', $key, $val));
-					}
-					$this->length = $val;
-					break;
-					
-				default:
-					throw new InvalidArgumentException(sprintf('Unknown attribute "%s".', $key));
-			}
-		}
-	
+		$this->filename = $this->takeOption('filename', $options);
+		$this->mimetype = $this->takeOption('mimetype', $options);
+		$this->content = $this->takeOption('content', $options);
+		$this->streamFn = $this->takeOption('stream', $options);
+		$this->length = $this->takeOption('length', $options);
+		$this->lastModified = $this->takeOption('lastmodified', $options);
+		$this->hash = $this->takeOption('hash', $options);
+		$this->attributes = $this->takeOption('attributes', $options, []);
+		$this->denyRemainingOptions($options);
 	}
 
 	/**
@@ -241,7 +193,18 @@ class FileResource implements FileResourceInterface
 			return fopen($this->path, 'rb', false, $context);
 		}
 	}
-
+	
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * {@inheritdoc}
+	 * @see ResourceInterface::getAttributes()
+	 */
+	public function getAttributes(): array
+	{
+		return $this->attributes;
+	}
+	
 	public function __toString()
 	{
 		return sprintf('[FileResource %s %s %s]', $this->getPath(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));

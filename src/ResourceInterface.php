@@ -25,7 +25,7 @@ interface ResourceInterface
 
 	/**
 	 *
-	 * @return \DateTime
+	 * @return \DateTimeInterface
 	 */
 	public function getLastModified();
 
@@ -42,10 +42,18 @@ interface ResourceInterface
 	public function getStream($context = null);
 
 	/**
+	 * Size in bytes.
 	 *
-	 * @return int size in bytes
+	 * @return int 
 	 */
 	public function getLength();
+
+	/**
+	 * Optional attributes. Should be serializable. 
+	 * 
+	 * @return array 
+	 */
+	public function getAttributes(): array;
 
 }
 

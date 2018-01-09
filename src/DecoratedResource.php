@@ -27,91 +27,106 @@ class DecoratedResource implements DecoratedResourceInterface
 	private $lastModified = false;
 
 	private $hash = false;
+	
+	private $attributes = false;
 
 	private $resource;
+	
+	use OptionsTrait;
 
 	/**
 	 *
-	 * @param array $attributes
+	 * @param array $options
 	 */
-	public function __construct(ResourceInterface $resource, array $attributes)
+	public function __construct(ResourceInterface $resource, array $options)
 	{
 		$this->resource = $resource;
-		if (array_key_exists('stream', $attributes) && array_key_exists('content', $attributes)) {
-			throw new InvalidArgumentException('Attribute "stream" and "content" are exclusive.');
+		
+		$this->mutuallyExlusiveOptions($options, 'content', 'stream');
+		$this->filename = $this->takeOption('filename', $options, false);
+		$this->mimetype = $this->takeOption('mimetype', $options, false);
+		$this->content = $this->takeOption('content', $options, false);
+		$this->streamFn = $this->takeOption('stream', $options, false);
+		$this->length = $this->takeOption('length', $options, false);
+		$this->lastModified = $this->takeOption('lastmodified', $options, false);
+		$this->hash = $this->takeOption('hash', $options, false);
+		$this->attributes = $this->takeOption('attributes', $options, false);
+		$this->denyRemainingOptions($options);
+		
+		if (is_null($this->length) && ! is_null($this->content)) {
+			$this->length = strlen($this->content);
 		}
-		$this->acceptAttributes($attributes);
 	}
 
-	private function acceptAttributes(array & $attributes)
+	private function acceptOptions(array & $options)
 	{
 		
-		foreach ($attributes as $key => $val) {
+		foreach ($options as $key => $val) {
 			switch ($key) {
 				
 				case 'content':
 					if (! is_string($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected option "%s" to be string but got %s.', $key, gettype($val)));
 					}
 					$this->content = $val;
 					break;
 				
 				case 'stream':
 					if (! is_callable($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be callable but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected option "%s" to be callable but got %s.', $key, gettype($val)));
 					}
 					$this->streamFn = $val;
 					break;
 				
 				case 'filename':
 					if (! is_string($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Option "%s" is empty.', $key));
 					}
 					$this->filename = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
 				
 				case 'length':
 					if (! is_int($val) && ! is_null($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type int but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type int but got %s.', $key, gettype($val)));
 					}
 					if ($val < 0) {
-						throw new InvalidArgumentException(sprintf('Invalid attribute "%s": %s.', $key, $val));
+						throw new InvalidArgumentException(sprintf('Invalid option "%s": %s.', $key, $val));
 					}
 					$this->length = $val;
 					break;
 				
 				case 'lastmodified':
 					if (! $val instanceof \DateTime) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be a DateTime but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected option "%s" to be a DateTime but got %s.', $key, gettype($val)));
 					}
 					$this->lastModified = $val;
 					break;
 				
 				case 'mimetype':
 					if (! is_string($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Option "%s" is empty.', $key));
 					}
 					$this->mimetype = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
 				
 				case 'hash':
 					if (! is_string($val)) {
-						throw new InvalidArgumentException(sprintf('Expected attribute "%s" to be of type string but got %s.', $key, gettype($val)));
+						throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type string but got %s.', $key, gettype($val)));
 					}
 					if (strlen(trim($val)) == 0) {
-						throw new InvalidArgumentException(sprintf('Attribute "%s" is empty.', $key));
+						throw new InvalidArgumentException(sprintf('Option "%s" is empty.', $key));
 					}
 					$this->hash = $val;
 					break;
 				
 				default:
-					throw new InvalidArgumentException(sprintf('Unknown attribute "%s".', $key));
+					throw new InvalidArgumentException(sprintf('Unknown option "%s".', $key));
 			}
 		}
 	
@@ -174,7 +189,7 @@ class DecoratedResource implements DecoratedResourceInterface
 	 */
 	public function getStream($context = null)
 	{
-		if ($this->content !== false) {
+		if (is_string($this->content)) {
 			$stream = fopen('php://memory', 'r+');
 			fwrite($stream, $this->content);
 			rewind($stream);
@@ -186,19 +201,28 @@ class DecoratedResource implements DecoratedResourceInterface
 		}
 		return $this->resource->getStream($context);
 	}
-
+	
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * {@inheritdoc}
+	 * @see ResourceInterface::getAttributes()
+	 */
+	public function getAttributes(): array
+	{
+		return $this->attributes === false ? $this->resource->getAttributes() : $this->attributes;
+	}
+	
+	
 	public function __toString()
 	{
-		return ResourceUtil::format($this);
+		return sprintf('[DecoratedResource %s %s %s]', $this->getFilename(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));
 	}
 
 	/**
 	 * The original, undecorated resource.
-	 *
-	 * {@inheritdoc}
-	 * @see \TS\Web\Resource\ResourceProviderInterface::getResource()
 	 */
-	public function getResource()
+	public function getUndecoratedResource()
 	{
 		return $this->resource;
 	}

@@ -28,6 +28,9 @@ class ResourceUtil
 
 	public static function formatSize($bytes, $precision = 2)
 	{
+		if (! is_int($bytes) || ! is_finite($bytes)) {
+			return '?';
+		}
 		$units = [
 			'B',
 			'KB',

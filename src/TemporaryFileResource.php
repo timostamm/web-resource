@@ -3,7 +3,6 @@
 namespace TS\Web\Resource;
 
 
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 
@@ -31,38 +30,27 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 
 	private $mimetype;
 
+	private $lastModified;
+
 	private $hashTimestamp = 0;
 
 	private $hash;
 
 	private $disposed = false;
+	
+	use OptionsTrait;
 
 	/**
 	 *
 	 * @param string $path
 	 * @param string $mimetype
 	 */
-	public function __construct($filename = null, $mimetype = null, \DateTime $lastmodified = null)
+	public function __construct($filename = null, $mimetype = null, \DateTimeInterface $lastmodified = null)
 	{
-		if ($filename == null || trim($filename) === '') {
-			$this->filename = 'temp';
-			if (isset($attributes['mimetype'])) {
-				$this->filename .= '.' . ExtensionGuesser::getInstance()->guess($attributes['mimetype']);
-			}
-		} else {
-			$filename = filter_var($filename, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
-			if (class_exists('\\Normalizer')) {
-				$filename = (new \Normalizer())->normalize($filename);
-			}
-			$filename = str_replace('..', '', $filename);
-			$filename = str_replace(':', '', $filename);
-			$filename = str_replace('/', '', $filename);
-			$filename = str_replace('\\', '', $filename);
-			$this->filename = $filename;
-		}
 		
-		$this->mimetype = $mimetype;
-		$this->lastmodified = $lastmodified;
+		$this->filename = $this->validateOptional('filename', $filename, 'temp');
+		$this->mimetype = $this->validateOptional('mimetype', $mimetype);
+		$this->lastModified = $this->validateOptional('lastmodified', $lastmodified);
 		
 		$this->path = ResourceUtil::createTempFile($this->filename);
 		
@@ -134,8 +122,8 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 	 */
 	public function getLastModified()
 	{
-		if ($this->lastmodified) {
-			return $this->lastmodified;
+		if ($this->lastModified) {
+			return $this->lastModified;
 		}
 		return new \DateTime('@' . filemtime($this->path));
 	}
@@ -167,7 +155,19 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 			return fopen($this->path, 'rb', false, $context);
 		}
 	}
-
+	
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * {@inheritdoc}
+	 * @see ResourceInterface::getAttributes()
+	 */
+	public function getAttributes(): array
+	{
+		return $this->attributes;
+	}
+	
+	
 	public function __toString()
 	{
 		return sprintf('[TemporaryFileResource %s %s %s]', $this->getFilename(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));
@@ -194,7 +194,6 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 	}
 
 	private static $instances = [];
-
 
 }
 
