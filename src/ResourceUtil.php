@@ -62,12 +62,18 @@ class ResourceUtil
 
 	public static function createTempFile($filename)
 	{
-		$file = filter_var($filename, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
-		
-		if (strlen(trim($file)) === 0) {
+		if (empty($filename)) {
 			throw new InvalidArgumentException('Invalid filename "' . $filename . '"');
 		}
-		
+		$file = trim($filename);
+		if (class_exists('\\Normalizer')) {
+			$file = (new \Normalizer())->normalize($file);
+		}
+		$file = filter_var($file, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+		$file = str_replace(['..', ':', '/', '\\'], '', $file);
+		if (empty($filename)) {
+			throw new InvalidArgumentException('Invalid filename "' . $filename . '"');
+		}
 		$returnCode = 0;
 		$outputLines = [];
 		$command = 'mktemp 2>&1 -d';

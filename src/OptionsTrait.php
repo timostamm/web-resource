@@ -91,10 +91,7 @@ trait OptionsTrait {
 					$val = (new \Normalizer())->normalize($val);
 				}
 				$val = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
-				$val = str_replace('..', '', $val);
-				$val = str_replace(':', '', $val);
-				$val = str_replace('/', '', $val);
-				$val = str_replace('\\', '', $val);
+				$val = str_replace(['..', ':', '/', '\\'], '', $val);
 				break;
 			
 			case 'length':
