@@ -37,6 +37,8 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 
 	private $hash;
 
+	private $attributes;
+	
 	private $disposed = false;
 	
 	use OptionsTrait;
@@ -46,11 +48,12 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 	 * @param string $path
 	 * @param string $mimetype
 	 */
-	public function __construct($filename = null, $mimetype = null, \DateTimeInterface $lastmodified = null)
+	public function __construct($filename = null, $mimetype = null, \DateTimeInterface $lastmodified = null, array $attributes = null)
 	{
 		$this->filename = $this->validateOptional('filename', $filename, 'temp');
 		$this->mimetype = $this->validateOptional('mimetype', $mimetype);
 		$this->lastModified = $this->validateOptional('lastmodified', $lastmodified);
+		$this->attributes = $this->validateOptional('attributes', $attributes, []);
 		
 		if (is_string($this->mimetype) && $this->filename === 'temp') {
 			$ext = ExtensionGuesser::getInstance()->guess($this->mimetype);
