@@ -69,9 +69,14 @@ class ResourceResponse extends Response
 
 	public function setAutoLastModified()
 	{
-	    $date = $this->resource->getLastModified();
-	    $date = new \DateTime($date->getTimestamp());
-		$this->setLastModified($date);
+	    $in = $this->resource->getLastModified();
+	    if ($in instanceof \DateTimeImmutable) {
+	        $date = new \DateTime();
+	        $date->setTimestamp($in->getTimestamp());
+            $this->setLastModified($date);
+        } else if ($in instanceof \DateTime) {
+            $this->setLastModified($in);
+        }
 		return $this;
 	}
 
