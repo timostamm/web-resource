@@ -16,11 +16,15 @@ use TS\Web\Resource\Exception\LogicException;
 class ResourceResponse extends Response
 {
 
+    /** @var ResourceInterface */
 	private $resource;
 
+	/** @var int */
 	private $offset;
 
+    /** @var int */
 	private $maxlen;
+
 
 	public function __construct(ResourceInterface $resource, $status = 200, $headers = [], $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
 	{
@@ -53,9 +57,17 @@ class ResourceResponse extends Response
 	
 	}
 
+    public function getResource()
+    {
+        return $this->resource;
+    }
+
+
 	public function setAutoLastModified()
 	{
-		$this->setLastModified($this->resource->getLastModified());
+	    $date = $this->resource->getLastModified();
+	    $date = new \DateTime($date->getTimestamp());
+		$this->setLastModified($date);
 		return $this;
 	}
 

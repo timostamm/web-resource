@@ -43,11 +43,13 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 	
 	use OptionsTrait;
 
-	/**
-	 *
-	 * @param string $path
-	 * @param string $mimetype
-	 */
+    /**
+     * TemporaryFileResource constructor.
+     * @param null $filename
+     * @param null $mimetype
+     * @param \DateTimeInterface|null $lastmodified
+     * @param array|null $attributes
+     */
 	public function __construct($filename = null, $mimetype = null, \DateTimeInterface $lastmodified = null, array $attributes = null)
 	{
 		$this->filename = $this->validateOptional('filename', $filename, 'temp');
@@ -77,6 +79,7 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 		}
 		return fopen($this->getPath(), $mode, false, $context);
 	}
+
 
 	/**
 	 * (non-PHPdoc)
