@@ -57,6 +57,10 @@ class ResourceResponse extends Response
 	
 	}
 
+
+    /**
+     * @return ResourceInterface
+     */
     public function getResource()
     {
         return $this->resource;
