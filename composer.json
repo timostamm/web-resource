@@ -2,7 +2,7 @@
 	"name" : "timostamm/web-resource",
 	"description": "PHP Web Resources",
 	"type" : "library",
-	"license" : "AGPL-3.0",
+	"license" : "AGPL-3.0-or-later",
 	"require" : {
 		"php": "^7.1",
 		"symfony/http-foundation" : ">=2.8"
