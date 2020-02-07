@@ -229,7 +229,7 @@ class HashStorage
     protected function deleteResourceDir(string $resourceDir, Exception $reason = null): void
     {
         foreach (scandir($resourceDir, SCANDIR_SORT_NONE) as $filename) {
-            if ($filename === 'meta.bin' || strpos($filename, 'content.') === 0) {
+            if ($filename === 'meta.bin' || strpos($filename, 'content') === 0) {
                 $ok = @unlink($resourceDir . '/' . $filename);
                 if (!$ok) {
                     $msg = sprintf('Failed to delete file "%s" in resource directory "%s".', $filename, $resourceDir);
