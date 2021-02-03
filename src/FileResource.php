@@ -90,7 +90,7 @@ class FileResource implements FileResourceInterface
 	 *
 	 * @see FileResourceInterface::open()
 	 */
-	public function open($mode, resource $context = null)
+	public function open($mode, $context = null)
 	{
 		if (is_null($context)) {
 			return fopen($this->getPath(), $mode, false);

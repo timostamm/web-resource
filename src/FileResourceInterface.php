@@ -25,6 +25,6 @@ interface FileResourceInterface extends ResourceInterface
 	 * @param string $mode mode used to fopen()
 	 * @param resource $context
 	 */
-	function open($mode, resource $context = null);
+	function open($mode, $context = null);
 	
 }

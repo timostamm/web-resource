@@ -68,7 +68,7 @@ class UrlResourceTest extends WebTestCase
 	public function testNotFound()
 	{
 		$this->expectException(\Exception::class);
-		$this->expectExceptionMessageRegExp('/^Got HTTP 404 for URL/');
+		$this->expectExceptionMessageMatches('/^Got HTTP 404 for URL/');
 		
 		$r = new UrlResource(self::$base_url . 'does-not-exist');
 		$r->getMimetype();
@@ -77,7 +77,7 @@ class UrlResourceTest extends WebTestCase
 	public function testError()
 	{
 		$this->expectException(\Exception::class);
-		$this->expectExceptionMessageRegExp('/^Got HTTP 500 for URL/');
+		$this->expectExceptionMessageMatches('/^Got HTTP 500 for URL/');
 		$r = new UrlResource(self::$base_url . 'foo-error');
 		$r->getMimetype();
 	}
