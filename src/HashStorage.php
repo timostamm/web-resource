@@ -5,7 +5,7 @@ namespace TS\Web\Resource;
 
 use Exception;
 use Generator;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Symfony\Component\Mime\MimeTypes;
 use TS\Web\Resource\Exception\IOException;
 use TS\Web\Resource\Exception\OutOfBoundsException;
 use TS\Web\Resource\Exception\StorageLogicException;
@@ -208,7 +208,8 @@ class HashStorage
     protected function makeContentFilename(string $mimetype): string
     {
         $name = 'content';
-        $ext = ExtensionGuesser::getInstance()->guess($mimetype);
+        $mimeTypes = new MimeTypes();
+        $ext = $mimeTypes->getExtensions($mimetype)[0] ?? null;
         if (!empty($ext)) {
             $name .= '.' . $ext;
         }

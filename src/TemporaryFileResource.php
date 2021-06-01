@@ -3,8 +3,7 @@
 namespace TS\Web\Resource;
 
 
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Symfony\Component\Mime\MimeTypes;
 
 
 /**
@@ -58,7 +57,8 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 		$this->attributes = $this->validateOptional('attributes', $attributes, []);
 		
 		if (is_string($this->mimetype) && $this->filename === 'temp') {
-			$ext = ExtensionGuesser::getInstance()->guess($this->mimetype);
+            $mimeTypes = new MimeTypes();
+			$ext = $mimeTypes->getExtensions($this->mimetype)[0] ?? null;
 			if (! empty($ext)) {
 				$this->filename .= '.' . $ext;
 			}
@@ -112,8 +112,8 @@ class TemporaryFileResource implements FileResourceInterface, TemporaryResourceI
 	public function getMimetype()
 	{
 		if (is_null($this->mimetype)) {
-			$guesser = MimeTypeGuesser::getInstance();
-			$this->mimetype = $guesser->guess($this->path);
+            $mimeTypes = new MimeTypes();
+			$this->mimetype = $mimeTypes->guessMimeType($this->path);
 		}
 		return $this->mimetype;
 	}
