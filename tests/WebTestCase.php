@@ -37,7 +37,8 @@ abstract class WebTestCase extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$webserver = new Process('exec php -S localhost:' . self::$port . ' -t ' . __DIR__ . '/Data ' . __FILE__);
+        self::$webserver = Process::fromShellCommandline('exec php -S localhost:' . self::$port . ' -t ' . __DIR__ . '/Data ' . __FILE__);
+        // self::$webserver = new Process(['php -S localhost:' . self::$port . ' -t ' . __DIR__ . '/Data ' . __FILE__]);
         self::$base_url = 'http://localhost:' . self::$port . '/';
         self::$port++;
         self::$webserver->start();

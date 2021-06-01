@@ -3,7 +3,7 @@
 namespace TS\Web\Resource;
 
 
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\Mime\MimeTypes;
 use TS\Web\Resource\Exception\InvalidArgumentException;
 use TS\Web\Resource\Exception\IOException;
 
@@ -136,8 +136,9 @@ class FileResource implements FileResourceInterface
 			if ($ext === 'js') {
 				return 'text/javascript';
 			}
-			$guesser = MimeTypeGuesser::getInstance();
-			$this->mimetype = $guesser->guess($this->getPath());
+
+            $mimeTypes = new MimeTypes();
+			$this->mimetype = $mimeTypes->guessMimeType($this->getPath());
 		}
 		return $this->mimetype;
 	}

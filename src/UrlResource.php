@@ -3,7 +3,7 @@
 namespace TS\Web\Resource;
 
 
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Symfony\Component\Mime\MimeTypes;
 use TS\Web\Resource\Exception\IOException;
 use TS\Web\Resource\Exception\InvalidArgumentException;
 
@@ -114,7 +114,8 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 		if ($this->filename == null) {
 			$filename = pathinfo($this->url)['basename'];
 			if (pathinfo($filename, PATHINFO_EXTENSION) === '') {
-				$ext = ExtensionGuesser::getInstance()->guess(explode(';', $this->getMimetype())[0]);
+                $mimeTypes = new MimeTypes();
+				$ext = $mimeTypes->getExtensions(explode(';', $this->getMimetype())[0])[0] ?? null;
 				if ($ext && $filename) {
 					$filename .= '.' . $ext;
 				}
