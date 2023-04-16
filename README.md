@@ -1,8 +1,5 @@
 # PHP Web Resources
 
-[![Build Status](https://api.travis-ci.org/timostamm/web-resource.png)](https://travis-ci.org/timostamm/web-resource)
-
-
 A collection of classes that represent resources, suited for delivery to a HTTP client. 
 
 The benefit of these classes is a common interface that bundles the data stream with a bunch of metadata like mimetype, modification date, etc. 
