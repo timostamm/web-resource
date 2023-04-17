@@ -1,7 +1,9 @@
 # PHP Web Resources
 
-[![Build Status](https://api.travis-ci.org/timostamm/web-resource.png)](https://travis-ci.org/timostamm/web-resource)
-
+[![build](https://github.com/timostamm/web-resource/workflows/CI/badge.svg)](https://github.com/timostamm/web-resource/actions?query=workflow:"CI")
+![Packagist PHP Version](https://img.shields.io/packagist/dependency-v/timostamm/web-resource/php)
+[![GitHub tag](https://img.shields.io/github/tag/timostamm/web-resource?include_prereleases=&sort=semver&color=blue)](https://github.com/timostamm/web-resource/releases/)
+[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
 A collection of classes that represent resources, suited for delivery to a HTTP client. 
 
