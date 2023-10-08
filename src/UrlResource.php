@@ -39,7 +39,7 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 	private $lastModified;
 
 	private $hash;
-	
+
 	use OptionsTrait;
 
 	/**
@@ -52,8 +52,8 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 	 *        	- lastmodified: Override the inferred date.
 	 *        	- mimetype: Override the mimetype.
 	 *        	- hash: Override the hash.
-	 *          - attributes: Set optional attributes. 
-	 *        	
+	 *          - attributes: Set optional attributes.
+	 *
 	 */
 	public function __construct($url, array $options = [])
 	{
@@ -76,14 +76,14 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 		if (file_exists($path)) {
 			throw new InvalidArgumentException(sprintf('File "%s" already exists.', $path));
 		}
-		
+
 		file_put_contents($path, $this->getStream());
-		
+
 		$res = new FileResource($path, [
 			'mimetype' => $this->getMimetype(),
 			'lastmodified' => $this->getLastModified()
 		]);
-		
+
 		return $res;
 	}
 
@@ -195,7 +195,7 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 			return fopen($this->bodyTempFile, 'rb', false, $context);
 		}
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 *
@@ -206,8 +206,8 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 	{
 		return $this->attributes;
 	}
-	
-	
+
+
 	public function __toString()
 	{
 		return sprintf('[UrlResource %s]', $this->url);
@@ -239,11 +239,11 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 			return;
 		}
 		$this->bodyRequested = true;
-		
+
 		$this->bodyTempFile = ResourceUtil::createTempDir() . $this->getFilename();
-		
+
 		$out = fopen($this->bodyTempFile, 'w');
-		
+
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $this->url);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
@@ -264,15 +264,15 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 			return;
 		}
 		$this->headRequested = true;
-		
+
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $this->url);
 		curl_setopt($ch, CURLOPT_NOBODY, true);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
 		curl_setopt($ch, CURLOPT_FAILONERROR, true);
-		
+
 		$a = [];
-		
+
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $headerline) use (&$a) {
 			$m = [];
 			preg_match('/Content-Disposition: (?:attachment|inline); filename="(.*)"/i', $headerline, $m);
@@ -301,17 +301,17 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 			}
 			return strlen($headerline);
 		});
-		
+
 		$ok = curl_exec($ch);
 		if (! $ok) {
 			$msg = sprintf('Got HTTP %s for URL "%s".', curl_getinfo($ch, CURLINFO_HTTP_CODE), $this->url);
 			throw new IOException($msg);
 		}
 		curl_close($ch);
-		
+
 		if ($this->filename == null && isset($a['filename'])) {
 			$val = $a['filename'];
-			$val = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+			$val = filter_var($val, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 			$this->filename = $val;
 		}
 		if ($this->lastModified == null) {
@@ -319,11 +319,11 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 		}
 		if ($this->mimetype == null) {
 			$val = isset($a['mimetype']) ? $a['mimetype'] : null;
-			$this->mimetype = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+			$this->mimetype = filter_var($val, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 		}
 		if ($this->length == null && isset($a['length'])) {
 			$this->length = isset($a['length']) ? $a['length'] : null;
-		
+
 		}
 	}
 

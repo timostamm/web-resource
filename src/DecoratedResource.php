@@ -27,11 +27,11 @@ class DecoratedResource implements DecoratedResourceInterface
 	private $lastModified = false;
 
 	private $hash = false;
-	
+
 	private $attributes = false;
 
 	private $resource;
-	
+
 	use OptionsTrait;
 
 	/**
@@ -41,7 +41,7 @@ class DecoratedResource implements DecoratedResourceInterface
 	public function __construct(ResourceInterface $resource, array $options)
 	{
 		$this->resource = $resource;
-		
+
 		$this->mutuallyExlusiveOptions($options, 'content', 'stream');
 		$this->filename = $this->takeOption('filename', $options, false);
 		$this->mimetype = $this->takeOption('mimetype', $options, false);
@@ -52,7 +52,7 @@ class DecoratedResource implements DecoratedResourceInterface
 		$this->hash = $this->takeOption('hash', $options, false);
 		$this->attributes = $this->takeOption('attributes', $options, false);
 		$this->denyRemainingOptions($options);
-		
+
 		if (is_null($this->length) && ! is_null($this->content)) {
 			$this->length = strlen($this->content);
 		}
@@ -60,24 +60,24 @@ class DecoratedResource implements DecoratedResourceInterface
 
 	private function acceptOptions(array & $options)
 	{
-		
+
 		foreach ($options as $key => $val) {
 			switch ($key) {
-				
+
 				case 'content':
 					if (! is_string($val)) {
 						throw new InvalidArgumentException(sprintf('Expected option "%s" to be string but got %s.', $key, gettype($val)));
 					}
 					$this->content = $val;
 					break;
-				
+
 				case 'stream':
 					if (! is_callable($val)) {
 						throw new InvalidArgumentException(sprintf('Expected option "%s" to be callable but got %s.', $key, gettype($val)));
 					}
 					$this->streamFn = $val;
 					break;
-				
+
 				case 'filename':
 					if (! is_string($val)) {
 						throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type string but got %s.', $key, gettype($val)));
@@ -85,9 +85,9 @@ class DecoratedResource implements DecoratedResourceInterface
 					if (strlen(trim($val)) == 0) {
 						throw new InvalidArgumentException(sprintf('Option "%s" is empty.', $key));
 					}
-					$this->filename = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+					$this->filename = filter_var($val, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
-				
+
 				case 'length':
 					if (! is_int($val) && ! is_null($val)) {
 						throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type int but got %s.', $key, gettype($val)));
@@ -97,14 +97,14 @@ class DecoratedResource implements DecoratedResourceInterface
 					}
 					$this->length = $val;
 					break;
-				
+
 				case 'lastmodified':
 					if (! $val instanceof \DateTime) {
 						throw new InvalidArgumentException(sprintf('Expected option "%s" to be a DateTime but got %s.', $key, gettype($val)));
 					}
 					$this->lastModified = $val;
 					break;
-				
+
 				case 'mimetype':
 					if (! is_string($val)) {
 						throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type string but got %s.', $key, gettype($val)));
@@ -112,9 +112,9 @@ class DecoratedResource implements DecoratedResourceInterface
 					if (strlen(trim($val)) == 0) {
 						throw new InvalidArgumentException(sprintf('Option "%s" is empty.', $key));
 					}
-					$this->mimetype = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+					$this->mimetype = filter_var($val, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 					break;
-				
+
 				case 'hash':
 					if (! is_string($val)) {
 						throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type string but got %s.', $key, gettype($val)));
@@ -124,12 +124,12 @@ class DecoratedResource implements DecoratedResourceInterface
 					}
 					$this->hash = $val;
 					break;
-				
+
 				default:
 					throw new InvalidArgumentException(sprintf('Unknown option "%s".', $key));
 			}
 		}
-	
+
 	}
 
 	/**
@@ -201,7 +201,7 @@ class DecoratedResource implements DecoratedResourceInterface
 		}
 		return $this->resource->getStream($context);
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 *
@@ -212,8 +212,8 @@ class DecoratedResource implements DecoratedResourceInterface
 	{
 		return $this->attributes === false ? $this->resource->getAttributes() : $this->attributes;
 	}
-	
-	
+
+
 	public function __toString()
 	{
 		return sprintf('[DecoratedResource %s %s %s]', $this->getFilename(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));
