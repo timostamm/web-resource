@@ -9,10 +9,11 @@
 		"symfony/mime": ">=4.4 < 6"
 	},
 	"require-dev" : {
+		"ext-zip": "*",
 		"phpunit/phpunit" : "^8.5.23 || ^9",
 		"symfony/process" : ">=4.4 < 6",
 		"mikey179/vfsstream": "^1.6.11"
-	},
+    },
 	"autoload" : {
 		"psr-4" : {
 			"TS\\Web\\Resource\\" : "src/"
