@@ -218,6 +218,11 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 	public function dispose()
 	{
 		$f = $this->bodyTempFile;
+        if (!is_string($f)) {
+            $this->disposed = true;
+            return;
+        }
+
 		if (file_exists($f)) {
 			unlink($f);
 		}
