@@ -14,7 +14,7 @@ class HashStorageTest extends TestCase
 
     public function testEmpty()
     {
-        $this->assertCount(0, $this->storage->listHashes());
+        $this->assertCount(0, iterator_to_array($this->storage->listHashes()));
     }
 
     public function testCleanupAfterWriteFailure()
@@ -39,7 +39,7 @@ class HashStorageTest extends TestCase
 
         } catch (IOException $ex) {
             $this->assertEquals('Failed to store resource.', $ex->getMessage());
-            $this->assertCount(0, $this->storage->listHashes());
+            $this->assertCount(0, iterator_to_array($this->storage->listHashes()));
         }
     }
 
@@ -52,9 +52,9 @@ class HashStorageTest extends TestCase
 
     public function testPut()
     {
-        $this->assertCount(0, $this->storage->listHashes());
+        $this->assertCount(0, iterator_to_array($this->storage->listHashes()));
         $this->storage->put($this->a);
-        $this->assertCount(1, $this->storage->listHashes());
+        $this->assertCount(1, iterator_to_array($this->storage->listHashes()));
     }
 
     private $storageDir;
