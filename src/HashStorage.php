@@ -100,9 +100,9 @@ class HashStorage
                     $this->deleteResourceDir($dir_tmp, $exception);
                 }
             } catch (Exception $cleanup) {
-                throw new IOException('Failed to store resource.', null, $cleanup);
+                throw new IOException('Failed to store resource.', 0, $cleanup);
             }
-            throw new IOException('Failed to store resource.', null, $exception);
+            throw new IOException('Failed to store resource.', 0, $exception);
         }
     }
 
@@ -234,7 +234,7 @@ class HashStorage
                 $ok = @unlink($resourceDir . '/' . $filename);
                 if (!$ok) {
                     $msg = sprintf('Failed to delete file "%s" in resource directory "%s".', $filename, $resourceDir);
-                    throw new IOException($msg, null, $reason);
+                    throw new IOException($msg, 0, $reason);
                 }
             }
         }
@@ -242,7 +242,7 @@ class HashStorage
         $ok = @rmdir($resourceDir);
         if ($ok === false) {
             $msg = sprintf('Failed to delete resource directory "%s".', $resourceDir);
-            throw new IOException($msg, null, $reason);
+            throw new IOException($msg, 0, $reason);
         }
     }
 
