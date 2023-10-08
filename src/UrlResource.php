@@ -40,6 +40,8 @@ class UrlResource implements ResourceInterface, TemporaryResourceInterface
 
 	private $hash;
 
+    private $attributes;
+
 	use OptionsTrait;
 
 	/**
