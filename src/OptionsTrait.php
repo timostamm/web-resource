@@ -67,19 +67,19 @@ trait OptionsTrait {
 	private function validateOption($key, $val)
 	{
 		switch ($key) {
-			
+
 			case 'content':
 				if (! is_string($val)) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be string but got %s.', $key, gettype($val)));
 				}
 				break;
-			
+
 			case 'stream':
 				if (! is_callable($val)) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be callable but got %s.', $key, gettype($val)));
 				}
 				break;
-			
+
 			case 'filename':
 				if (! is_string($val)) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type string but got %s.', $key, gettype($val)));
@@ -90,10 +90,10 @@ trait OptionsTrait {
 				if (class_exists('\\Normalizer')) {
 					$val = (new \Normalizer())->normalize($val);
 				}
-				$val = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+				$val = filter_var($val, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 				$val = str_replace(['..', ':', '/', '\\'], '', $val);
 				break;
-			
+
 			case 'length':
 				if (! is_int($val)) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type int but got %s.', $key, gettype($val)));
@@ -102,13 +102,13 @@ trait OptionsTrait {
 					throw new InvalidArgumentException(sprintf('Invalid option "%s": %s.', $key, $val));
 				}
 				break;
-			
+
 			case 'lastmodified':
 				if (! $val instanceof \DateTimeInterface) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be a DateTimeInterface but got %s.', $key, is_object($val) ? get_class($val) : gettype($val)));
 				}
 				break;
-			
+
 			case 'mimetype':
 				if (! is_string($val)) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type string but got %s.', $key, gettype($val)));
@@ -116,9 +116,9 @@ trait OptionsTrait {
 				if (strlen(trim($val)) == 0) {
 					throw new InvalidArgumentException(sprintf('Option "%s" is empty.', $key));
 				}
-				$val = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+				$val = filter_var($val, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 				break;
-			
+
 			case 'hash':
 				if (! is_string($val)) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type string but got %s.', $key, gettype($val)));
@@ -127,19 +127,19 @@ trait OptionsTrait {
 					throw new InvalidArgumentException(sprintf('Option "%s" is empty.', $key));
 				}
 				break;
-			
+
 			case 'timeout':
 				if (! is_int($val)) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be of type integer but got %s.', $key, gettype($val)));
 				}
 				break;
-			
+
 			case 'attributes':
 				if (! is_array($val)) {
 					throw new InvalidArgumentException(sprintf('Expected option "%s" to be array but got %s.', $key, gettype($val)));
 				}
 				break;
-			
+
 			default:
 				throw new InvalidArgumentException(sprintf('Unknown option "%s".', $key));
 		}

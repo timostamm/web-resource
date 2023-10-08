@@ -69,7 +69,7 @@ class ResourceUtil
 		if (class_exists('\\Normalizer')) {
 			$file = (new \Normalizer())->normalize($file);
 		}
-		$file = filter_var($file, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+		$file = filter_var($file, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 		$file = str_replace(['..', ':', '/', '\\'], '', $file);
 		if (empty($filename)) {
 			throw new InvalidArgumentException('Invalid filename "' . $filename . '"');
