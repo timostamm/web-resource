@@ -18,12 +18,8 @@ class FileResource implements FileResourceInterface
 
 	/**
 	 * Converts any resource to a local resource.
-	 *
-	 * @param ResourceInterface $resource
-	 * @param string $path
-	 * @return FileResource
 	 */
-	public static function fromResource(ResourceInterface $resource, $path)
+	public static function fromResource(ResourceInterface $resource, string $path): FileResourceInterface
 	{
 		if ($resource instanceof FileResourceInterface) {
 			return $resource;
@@ -43,12 +39,18 @@ class FileResource implements FileResourceInterface
 
 	private $mimetype;
 
+    private $content;
+
+    private $streamFn;
+
 	private $length;
 
 	private $lastModified;
 
 	private $hash;
-	
+
+    private $attributes;
+
 	use OptionsTrait;
 
 	/**
@@ -71,9 +73,9 @@ class FileResource implements FileResourceInterface
 		if (is_dir($path)) {
 			throw new InvalidArgumentException(sprintf('Path points to a directory: %s.', $path));
 		}
-		
+
 		$this->path = $path;
-		
+
 		$this->filename = $this->takeOption('filename', $options);
 		$this->mimetype = $this->takeOption('mimetype', $options);
 		$this->content = $this->takeOption('content', $options);
@@ -195,7 +197,7 @@ class FileResource implements FileResourceInterface
 			return fopen($this->path, 'rb', false, $context);
 		}
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 *
@@ -206,7 +208,7 @@ class FileResource implements FileResourceInterface
 	{
 		return $this->attributes;
 	}
-	
+
 	public function __toString()
 	{
 		return sprintf('[FileResource %s %s %s]', $this->getPath(), $this->getMimetype(), ResourceUtil::formatSize($this->getLength()));
