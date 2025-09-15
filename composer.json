@@ -4,14 +4,14 @@
 	"type" : "library",
 	"license" : "AGPL-3.0-or-later",
 	"require" : {
-		"php": "^7.2 || ^8.0",
-		"symfony/http-foundation" : ">=4.4 < 6",
-		"symfony/mime": ">=4.4 < 6"
+		"php": "^8.0",
+		"symfony/http-foundation" : "^5.4 || ^6.4",
+		"symfony/mime": "^5.4 || ^6.4"
 	},
 	"require-dev" : {
 		"ext-zip": "*",
-		"phpunit/phpunit" : "^8.5.23 || ^9",
-		"symfony/process" : ">=4.4 < 6",
+		"phpunit/phpunit" : "^9.6.20",
+		"symfony/process" : "^5.4 || ^6.4",
 		"mikey179/vfsstream": "^1.6.11"
     },
 	"autoload" : {
