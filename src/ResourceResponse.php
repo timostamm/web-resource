@@ -16,7 +16,7 @@ use TS\Web\Resource\Exception\LogicException;
  * - Stream-based content delivery
  *
  * @author Timo Stamm <ts@timostamm.de>
- * @license AGPLv3.0 https://www.gnu.org/licenses/agpl-3.0.txt
+ * @license MIT https://opensource.org/licenses/MIT
  */
 class ResourceResponse extends Response
 {

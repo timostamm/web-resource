@@ -8,7 +8,7 @@ namespace TS\Web\Resource;
  * They provide a path to the file via the getPath() method.
  * 
  * @author Timo Stamm <ts@timostamm.de>
- * @license AGPLv3.0 https://www.gnu.org/licenses/agpl-3.0.txt
+ * @license MIT https://opensource.org/licenses/MIT
  */
 interface FileResourceInterface extends ResourceInterface
 {
