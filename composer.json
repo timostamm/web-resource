@@ -2,7 +2,7 @@
 	"name" : "timostamm/web-resource",
 	"description": "PHP Web Resources",
 	"type" : "library",
-	"license" : "AGPL-3.0-or-later",
+	"license" : "MIT",
 	"require" : {
         "ext-curl": "*",
 		"php": "^8.0",
